@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<b:beans xmlns="http://www.springframework.org/schema/security"
+       xmlns:b="http://www.springframework.org/schema/beans"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/security
+       http://www.springframework.org/schema/security/spring-security.xsd">
+
+    <!--<context:property-placeholder location="/WEB-INF/applicationContext-security.properties"/>-->
+
+    <http entry-point-ref="casAuthenticationEntryPoint" use-expressions="true" access-denied-page="/denied.jsp">
+        <intercept-url pattern="/**" access="hasAnyRole(${cas.roles})"/>
+
+        <custom-filter ref="singleSignOutFilter" before="CAS_FILTER"/>
+        <custom-filter ref="casAuthenticationFilter" position="CAS_FILTER"/>
+        <custom-filter ref="requestSingleLogoutFilter" before="LOGOUT_FILTER"/>
+
+        <logout logout-url="/logout" logout-success-url="/cas-logout.jsp"/>
+    </http>
+
+    <authentication-manager alias="authenticationManager">
+        <authentication-provider ref="casAuthenticationProvider"/>
+    </authentication-manager>
+
+    <b:bean id="casAuthenticationEntryPoint" class="org.springframework.security.cas.web.CasAuthenticationEntryPoint"
+            p:loginUrl="${cas.loginUrl}"
+            p:serviceProperties-ref="serviceProperties"/>
+
+    <b:bean id="singleSignOutFilter" class="org.jasig.cas.client.session.SingleSignOutFilter"/>
+
+    <b:bean id="casAuthenticationFilter" class="org.springframework.security.cas.web.CasAuthenticationFilter"
+            p:authenticationManager-ref="authenticationManager"/>
+
+    <b:bean id="requestSingleLogoutFilter" class="org.springframework.security.web.authentication.logout.LogoutFilter" p:filterProcessesUrl="/j_spring_cas_security_logout">
+        <b:constructor-arg value="${cas.logoutUrl}"/>
+        <b:constructor-arg>
+            <b:bean class="org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler"/>
+        </b:constructor-arg>
+    </b:bean>
+
+    <b:bean id="casAuthenticationProvider" class="org.springframework.security.cas.authentication.CasAuthenticationProvider"
+            p:serviceProperties-ref="serviceProperties"
+            p:ticketValidator-ref="ticketValidator"
+            p:authenticationUserDetailsService-ref="userDetailsService"
+            p:key="casAuthProvider"/>
+
+    <b:bean id="serviceProperties" class="org.springframework.security.cas.ServiceProperties"
+            p:service="${cas.casService}"
+            p:sendRenew="false"/>
+
+    <!--<b:bean id="ticketValidator" class="org.jasig.cas.client.validation.Cas20ServiceTicketValidator">-->
+        <!--<b:constructor-arg index="0" value="${ticketValidator}"/>-->
+    <!--</b:bean>-->
+
+    <b:bean id="ticketValidator" class="ru.sav.saucemanager.cas.ArrayAwareCas20ServiceTicketValidator">
+        <b:constructor-arg index="0" value="${cas.ticketValidator}"/>
+    </b:bean>
+
+    <b:bean id="userDetailsService" class="org.springframework.security.cas.userdetails.GrantedAuthorityFromAssertionAttributesUserDetailsService" p:convertToUpperCase="false">
+        <b:constructor-arg>
+            <b:list>
+                <b:value>roles</b:value>
+            </b:list>
+        </b:constructor-arg>
+    </b:bean>
+
+</b:beans>
