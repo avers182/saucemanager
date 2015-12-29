@@ -5,7 +5,7 @@
 <html>
 
 <head>
-    <title>Sauce manager</title>
+    <title>LMS course manager</title>
     <link href='<c:url value="/resources/bootstrap/css/bootstrap.min.css"/>' rel="stylesheet">
 </head>
 

@@ -1,5 +1,7 @@
 package ru.sav.saucemanager.model;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.List;
 
@@ -48,6 +50,7 @@ public class RepositoryEntry {
         this.displayName = displayName;
     }
 
+    @JsonIgnore
     public SecGroup getParticipantGroup() {
         return participantGroup;
     }
@@ -56,6 +59,7 @@ public class RepositoryEntry {
         this.participantGroup = participantGroup;
     }
 
+    @JsonIgnore
     public SecGroup getTutorGroup() {
         return tutorGroup;
     }
@@ -64,6 +68,7 @@ public class RepositoryEntry {
         this.tutorGroup = tutorGroup;
     }
 
+    @JsonIgnore
     public SecGroup getOwnerGroup() {
         return ownerGroup;
     }
@@ -72,6 +77,7 @@ public class RepositoryEntry {
         this.ownerGroup = ownerGroup;
     }
 
+    @JsonIgnore
     public OlatResource getOlatResource() {
         return olatResource;
     }
@@ -80,6 +86,7 @@ public class RepositoryEntry {
         this.olatResource = olatResource;
     }
 
+    @JsonIgnore
     public List<RepositoryEntryToBsGroup> getRepositoryEntryToBsGroups() {
         return repositoryEntryToBsGroups;
     }

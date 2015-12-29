@@ -1,5 +1,7 @@
 package ru.sav.saucemanager.model;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
+
 import javax.persistence.*;
 
 @Entity
@@ -43,6 +45,7 @@ public class Identity {
         this.status = status;
     }
 
+    @JsonIgnore
     public User getUser() {
         return user;
     }

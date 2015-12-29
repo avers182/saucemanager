@@ -1,6 +1,8 @@
 package ru.sav.saucemanager.controller;
 
 import ru.sav.saucemanager.controller.form.DatePickForm;
+import ru.sav.saucemanager.model.QtiResultSet;
+import ru.sav.saucemanager.model.RepositoryEntry;
 import ru.sav.saucemanager.repositories.IdentityRepository;
 import ru.sav.saucemanager.repositories.QtiResultSetRepository;
 import ru.sav.saucemanager.repositories.RepositoryEntryRepository;
@@ -10,13 +12,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 @Controller
 @RequestMapping("/repositoryentry")
@@ -55,27 +59,19 @@ public class RepositoryEntryController {
         return "repositoryentry/view";
     }
 
-    @RequestMapping("/view/{id}/maintable")
-    public String viewMainTable(@PathVariable Long id, Model model) {
-        Calendar calendar = Calendar.getInstance();
-        Date now = calendar.getTime();
-        calendar.add(Calendar.MONTH, -1);
-        Date dateFrom = calendar.getTime();
-
-        model.addAttribute("datePickForm", new DatePickForm());
-        model.addAttribute("tests", repositoryEntryRepository.findReferences(id));
-        model.addAttribute("userProperties", userPropertyRepository.findByRepositoryEntryIdTimeBoundaries(id, dateFrom, now));
-        model.addAttribute("qtiResultSets", qtiResultSetRepository.findByRepositoryEntryIdLaterThen(id, dateFrom));
-        return "repositoryentry/view-maintable";
+    @RequestMapping("/{id}/tests")
+    public @ResponseBody List<RepositoryEntry> viewTests(@PathVariable Long id, Model model) {
+        return repositoryEntryRepository.findReferences(id);
     }
 
-    @RequestMapping(value = "/view/{id}/datepick", method = RequestMethod.POST)
-    public String viewDatePick(@PathVariable Long id, @ModelAttribute("datePickForm")DatePickForm datePickForm, BindingResult bindingResult, Model model) {
-        model.addAttribute("tests", repositoryEntryRepository.findReferences(id));
-        model.addAttribute("userProperties",
-                userPropertyRepository.findByRepositoryEntryIdTimeBoundaries(id, datePickForm.getDateFrom(), datePickForm.getDateTo()));
-        model.addAttribute("qtiResultSets", qtiResultSetRepository.findByRepositoryEntryIdLaterThen(id, datePickForm.getDateFrom()));
-        return "repositoryentry/view-maintable";
+    @RequestMapping("/{id}/userproperties")
+    public @ResponseBody List<Object[]> viewUserProperties(@PathVariable Long id, Model model) {
+        return userPropertyRepository.findByRepositoryEntryId(id);
+    }
+
+    @RequestMapping("/{id}/qtiresultsets")
+    public @ResponseBody List<QtiResultSet> viewQtiResultSets(@PathVariable Long id, Model model) {
+        return qtiResultSetRepository.findByRepositoryEntryId(id);
     }
 
 }
