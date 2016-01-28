@@ -65,10 +65,10 @@ public class ArrayAwareCas20ServiceTicketValidator extends Cas20ServiceTicketVal
                 String[] values = value.substring(1, value.length()-1).split(",");
                 List<String> valueList = new ArrayList<String>(values.length);
                 for (String val: values) {
-                    log.debug("Attr "+name+" item "+val);
+                    logger.debug("Attr "+name+" item "+val);
                     valueList.add(val.trim());
                 }
-                log.debug("Attr "+name+" = "+valueList);
+                logger.debug("Attr "+name+" = "+valueList);
                 attributes.put(name, valueList);
             } else {
                 attributes.put(name, value);

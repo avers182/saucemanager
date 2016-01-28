@@ -6,7 +6,7 @@
 
 <head>
     <title>LMS course manager</title>
-    <link href='<c:url value="/resources/bootstrap/css/bootstrap.min.css"/>' rel="stylesheet">
+    <link href='<c:url value="/static/bootstrap/css/bootstrap.min.css"/>' rel="stylesheet">
 </head>
 
 <body>
