@@ -120,4 +120,39 @@ public class QtiResultSet {
     public void setRepositoryEntry(RepositoryEntry repositoryEntry) {
         this.repositoryEntry = repositoryEntry;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        QtiResultSet that = (QtiResultSet) o;
+
+        if (creationDate != null ? !creationDate.equals(that.creationDate) : that.creationDate != null) return false;
+        if (duration != null ? !duration.equals(that.duration) : that.duration != null) return false;
+        if (id != null ? !id.equals(that.id) : that.id != null) return false;
+        if (identity != null ? !identity.equals(that.identity) : that.identity != null) return false;
+        if (isPassed != null ? !isPassed.equals(that.isPassed) : that.isPassed != null) return false;
+        if (isSuspended != null ? !isSuspended.equals(that.isSuspended) : that.isSuspended != null) return false;
+        if (lastModified != null ? !lastModified.equals(that.lastModified) : that.lastModified != null) return false;
+        if (olatResourceResid != null ? !olatResourceResid.equals(that.olatResourceResid) : that.olatResourceResid != null)
+            return false;
+        if (score != null ? !score.equals(that.score) : that.score != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (lastModified != null ? lastModified.hashCode() : 0);
+        result = 31 * result + (creationDate != null ? creationDate.hashCode() : 0);
+        result = 31 * result + (identity != null ? identity.hashCode() : 0);
+        result = 31 * result + (olatResourceResid != null ? olatResourceResid.hashCode() : 0);
+        result = 31 * result + (isPassed != null ? isPassed.hashCode() : 0);
+        result = 31 * result + (score != null ? score.hashCode() : 0);
+        result = 31 * result + (duration != null ? duration.hashCode() : 0);
+        result = 31 * result + (isSuspended != null ? isSuspended.hashCode() : 0);
+        return result;
+    }
 }
