@@ -4,7 +4,6 @@ import org.jasig.cas.client.session.SingleSignOutFilter;
 import org.jasig.cas.client.validation.Cas20ServiceTicketValidator;
 import org.jasig.cas.client.validation.TicketValidator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -27,23 +26,20 @@ import org.springframework.security.web.authentication.logout.SecurityContextLog
 @EnableWebSecurity
 @Profile("!test")
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
-    private String casService;
-    private String loginUrl;
-    private String logoutUrl;
-    private String ticketValidator;
-    private String roles;
+    @Autowired
+    SecuritySettings securitySettings;
 
     @Bean
     public ServiceProperties casServiceProperties() {
         ServiceProperties serviceProperties = new ServiceProperties();
         serviceProperties.setSendRenew(false);
-        serviceProperties.setService(casService);
+        serviceProperties.setService(securitySettings.getCasService());
         return serviceProperties;
     }
 
     @Bean
     public TicketValidator cas20ServiceTicketValidator() {
-        return new Cas20ServiceTicketValidator(ticketValidator);
+        return new Cas20ServiceTicketValidator(securitySettings.getTicketValidator());
 //        return new ArrayAwareCas20ServiceTicketValidator(ticketValidator);
     }
 
@@ -68,7 +64,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     public CasAuthenticationEntryPoint casAuthenticationEntryPoint() {
         CasAuthenticationEntryPoint entryPoint = new CasAuthenticationEntryPoint();
         entryPoint.setServiceProperties(casServiceProperties());
-        entryPoint.setLoginUrl(loginUrl);
+        entryPoint.setLoginUrl(securitySettings.getLoginUrl());
         return  entryPoint;
     }
 
@@ -86,9 +82,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public LogoutFilter logoutFilter() {
-        LogoutFilter filter = new LogoutFilter(logoutUrl, new SecurityContextLogoutHandler());
-        filter.setFilterProcessesUrl("/j_spring_cas_security_logout");
+    public LogoutFilter casTotalLogoutFilter() {
+        LogoutFilter filter = new LogoutFilter(securitySettings.getLogoutUrl(), new SecurityContextLogoutHandler());
+        filter.setFilterProcessesUrl("/logout/cas");
         return filter;
     }
 
@@ -106,55 +102,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         http.csrf().disable();
         http.exceptionHandling().authenticationEntryPoint(casAuthenticationEntryPoint()).accessDeniedPage("/denied.jsp");
 //        http.authorizeRequests().antMatchers("/**").hasAnyRole("viewLMS");
-        http.authorizeRequests().antMatchers("/**").authenticated();
+        http.authorizeRequests().antMatchers("/cas-logout.jsp").permitAll().antMatchers("/**").authenticated();
         http.logout().logoutSuccessUrl("/cas-logout.jsp");
         http.addFilterBefore(singleSignOutFilter(), CasAuthenticationFilter.class)
                 .addFilter(casAuthenticationFilter())
-                .addFilterBefore(logoutFilter(), LogoutFilter.class);
+                .addFilterBefore(casTotalLogoutFilter(), LogoutFilter.class);
     }
 
-    public String getCasService() {
-        return casService;
-    }
-
-    @Value("${cas.casService}")
-    public void setCasService(String casService) {
-        this.casService = casService;
-    }
-
-    public String getLoginUrl() {
-        return loginUrl;
-    }
-
-    @Value("${cas.loginUrl}")
-    public void setLoginUrl(String loginUrl) {
-        this.loginUrl = loginUrl;
-    }
-
-    public String getLogoutUrl() {
-        return logoutUrl;
-    }
-
-    @Value("${cas.logoutUrl}")
-    public void setLogoutUrl(String logoutUrl) {
-        this.logoutUrl = logoutUrl;
-    }
-
-    public String getTicketValidator() {
-        return ticketValidator;
-    }
-
-    @Value("${cas.ticketValidator}")
-    public void setTicketValidator(String ticketValidator) {
-        this.ticketValidator = ticketValidator;
-    }
-
-    public String getRoles() {
-        return roles;
-    }
-
-    @Value("${cas.roles}")
-    public void setRoles(String roles) {
-        this.roles = roles;
-    }
 }
